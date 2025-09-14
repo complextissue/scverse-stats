@@ -1,0 +1,56 @@
+name: Generate and deploy scverse stats
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Run daily at 06:00 UTC to get fresh stats
+    - cron: "0 6 * * *"
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate scverse stats
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm start
+
+      - name: Prepare build directory
+        run: |
+          mkdir -p build
+          touch build/.nojekyll
+          cp -r output/* build/
+
+      - name: Check if stats.json exists and is valid
+        run: |
+          if [ ! -s build/stats.json ]; then
+            echo "Error: stats.json is empty or does not exist"
+            exit 1
+          fi
+          # Validate JSON syntax
+          jq empty build/stats.json
+
+      - name: Build & Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "scverse-stats",
+  "compatibility_date": "2025-05-06",
+  "main": "./deploy/index.js",
+  "routes": [
+    {
+      "pattern": "scverse-stats.complextissue.com/*",
+      "custom_domain": true,
+    },
+  ],
+  "assets": {
+    "directory": "./output/",
+    "run_worker_first": true,
+    "binding": "ASSETS",
+  },
+}
