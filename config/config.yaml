@@ -1,13 +1,13 @@
 core_packages:
   - anndata
-  # - mudata
-  # - spatialdata
-  # - scanpy
-  # - muon
-  # - squidpy
-  # - scvi-tools
-  # - scirpy
-  # - SnapATAC2
-  # - rapids_singlecell
-  # - pertpy
-  # - decoupler
+  - mudata
+  - spatialdata
+  - scanpy
+  - muon
+  - squidpy
+  - scvi-tools
+  - scirpy
+  - SnapATAC2
+  - rapids_singlecell
+  - pertpy
+  - decoupler
