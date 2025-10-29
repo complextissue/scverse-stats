@@ -2,9 +2,26 @@ import "dotenv/config";
 import { promises as fs } from "fs";
 import { join } from "path";
 import * as yaml from "js-yaml";
+import { z } from "zod";
 import { octokit } from "../octokit";
 import { GitHubDataSchema, GitHubRepository } from "../types";
 import { saveJson, sleep } from "../utils";
+
+const ContributorSchema = z.object({
+  login: z.string(),
+  name: z.string().nullable(),
+  avatar_url: z.string().url(),
+  html_url: z.string().url(),
+  contributions: z.number(),
+});
+
+const ContributorsDataSchema = z.object({
+  total_contributors: z.number(),
+  contributors: z.array(ContributorSchema),
+  timestamp: z.string(),
+});
+
+type Contributor = z.infer<typeof ContributorSchema>;
 
 async function getStarStats(owner: string, repo: string) {
   const now = new Date();
@@ -225,15 +242,17 @@ async function getIssueStats(owner: string, repo: string) {
 async function collectContributors(repos: GitHubRepository[]): Promise<{
   allContributors: Set<string>;
   repoContributorCounts: Map<string, number>;
+  contributorsDetails: Contributor[];
 }> {
   const allContributors = new Set<string>();
   const repoContributorCounts = new Map<string, number>();
+  const contributorsMap = new Map<string, Contributor>();
 
   for (const repo of repos) {
     const repoContributors = new Set<string>();
     let page = 1;
 
-    while (true) {
+    while (page < 50) {
       const { data } = await octokit.rest.repos.listContributors({
         owner: "scverse",
         repo: repo.name,
@@ -243,13 +262,54 @@ async function collectContributors(repos: GitHubRepository[]): Promise<{
 
       if (data.length === 0) break;
 
-      data.forEach((c) => {
+      for (const contributor of data) {
+        if (!contributor.login) continue;
+
         // Filter out bots
-        if (c.login && !c.login.endsWith("[bot]") && !c.login.endsWith("-bot")) {
-          allContributors.add(c.login);
-          repoContributors.add(c.login);
+        if (contributor.login.endsWith("[bot]") || contributor.login.endsWith("-bot")) {
+          continue;
         }
-      });
+
+        allContributors.add(contributor.login);
+        repoContributors.add(contributor.login);
+
+        const existing = contributorsMap.get(contributor.login);
+
+        if (existing) {
+          // Add contributions from this repo
+          existing.contributions += contributor.contributions || 0;
+        } else {
+          // Fetch detailed user info for name
+          try {
+            const { data: userInfo } = await octokit.rest.users.getByUsername({
+              username: contributor.login,
+            });
+
+            contributorsMap.set(contributor.login, {
+              login: contributor.login,
+              name: userInfo.name || contributor.login,
+              avatar_url: contributor.avatar_url || "",
+              html_url:
+                contributor.html_url ||
+                `https://github.com/${contributor.login}`,
+              contributions: contributor.contributions || 0,
+            });
+
+            await sleep(100); // Rate limit protection
+          } catch (error) {
+            // Fallback if user info fetch fails
+            contributorsMap.set(contributor.login, {
+              login: contributor.login,
+              name: contributor.login,
+              avatar_url: contributor.avatar_url || "",
+              html_url:
+                contributor.html_url ||
+                `https://github.com/${contributor.login}`,
+              contributions: contributor.contributions || 0,
+            });
+          }
+        }
+      }
 
       if (data.length < 100) break;
       page++;
@@ -257,9 +317,15 @@ async function collectContributors(repos: GitHubRepository[]): Promise<{
     }
 
     repoContributorCounts.set(repo.name, repoContributors.size);
+    console.log(`  ${repo.name}: ${repoContributors.size} contributors`);
   }
 
-  return { allContributors, repoContributorCounts };
+  // Convert to array and sort by contributions
+  const contributorsDetails = Array.from(contributorsMap.values()).sort(
+    (a, b) => b.contributions - a.contributions,
+  );
+
+  return { allContributors, repoContributorCounts, contributorsDetails };
 }
 
 async function getOrgMemberCount(org: string): Promise<number> {
@@ -376,4 +442,14 @@ export async function collectGitHubStats(): Promise<void> {
   console.log(
     `Total stars: ${validated.total_stars}, Contributors: ${validated.unique_contributors}`,
   );
+
+  // Save detailed contributors data
+  const contributorsValidated = ContributorsDataSchema.parse({
+    total_contributors: contributorsData.contributorsDetails.length,
+    contributors: contributorsData.contributorsDetails,
+    timestamp: new Date().toISOString(),
+  });
+
+  await saveJson("contributors.json", contributorsValidated);
+  console.log(`Total unique contributors: ${contributorsValidated.total_contributors}`);
 }
