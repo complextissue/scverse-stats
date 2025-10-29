@@ -33,6 +33,7 @@ jobs:
           ZULIP_EMAIL: ${{ secrets.ZULIP_EMAIL }}
           ZULIP_API_KEY: ${{ secrets.ZULIP_API_KEY }}
           ZULIP_REALM: ${{ secrets.ZULIP_REALM }}
+          PEPY_API_KEY: ${{ secrets.PEPY_API_KEY }}
         run: |
           npm start
 
