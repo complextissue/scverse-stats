@@ -58,20 +58,36 @@ async function getPRStats(owner: string, repo: string) {
     now.getDate(),
   );
 
-  const { data: openPRs } = await octokit.rest.pulls.list({
+  // Get count of open PRs
+  const { headers: openHeaders } = await octokit.rest.pulls.list({
     owner,
     repo,
     state: "open",
     per_page: 1,
   });
 
-  const { data: closedPRs } = await octokit.rest.pulls.list({
+  // Get count of closed PRs
+  const { headers: closedHeaders } = await octokit.rest.pulls.list({
     owner,
     repo,
     state: "closed",
     per_page: 1,
   });
 
+  // Parse pagination headers to get total counts
+  let openCount = 1;
+  if (openHeaders.link) {
+    const match = openHeaders.link.match(/page=(\d+)>; rel="last"/);
+    openCount = match ? parseInt(match[1]) : 1;
+  }
+
+  let closedCount = 1;
+  if (closedHeaders.link) {
+    const match = closedHeaders.link.match(/page=(\d+)>; rel="last"/);
+    closedCount = match ? parseInt(match[1]) : 1;
+  }
+
+  // Count PRs created in the last month
   let prsLastMonth = 0;
   let page = 1;
 
@@ -100,8 +116,8 @@ async function getPRStats(owner: string, repo: string) {
   }
 
   return {
-    open: openPRs[0]?.number || 0,
-    closed: closedPRs[0]?.number || 0,
+    open: openCount,
+    closed: closedCount,
     last_month: prsLastMonth,
   };
 }
@@ -114,20 +130,36 @@ async function getIssueStats(owner: string, repo: string) {
     now.getDate(),
   );
 
-  const { data: openIssues } = await octokit.rest.issues.listForRepo({
+  // Get count of open issues (excluding PRs)
+  const { headers: openHeaders } = await octokit.rest.issues.listForRepo({
     owner,
     repo,
     state: "open",
     per_page: 1,
   });
 
-  const { data: closedIssues } = await octokit.rest.issues.listForRepo({
+  // Get count of closed issues (excluding PRs)
+  const { headers: closedHeaders } = await octokit.rest.issues.listForRepo({
     owner,
     repo,
     state: "closed",
     per_page: 1,
   });
 
+  // Parse pagination headers to get total counts
+  let openCount = 1;
+  if (openHeaders.link) {
+    const match = openHeaders.link.match(/page=(\d+)>; rel="last"/);
+    openCount = match ? parseInt(match[1]) : 1;
+  }
+
+  let closedCount = 1;
+  if (closedHeaders.link) {
+    const match = closedHeaders.link.match(/page=(\d+)>; rel="last"/);
+    closedCount = match ? parseInt(match[1]) : 1;
+  }
+
+  // Count issues created in the last month (excluding PRs)
   let issuesLastMonth = 0;
   let page = 1;
 
@@ -160,8 +192,8 @@ async function getIssueStats(owner: string, repo: string) {
   }
 
   return {
-    open: openIssues[0]?.number || 0,
-    closed: closedIssues[0]?.number || 0,
+    open: openCount,
+    closed: closedCount,
     last_month: issuesLastMonth,
   };
 }
