@@ -130,39 +130,62 @@ async function getIssueStats(owner: string, repo: string) {
     now.getDate(),
   );
 
-  // Get count of open issues (excluding PRs)
-  const { headers: openHeaders } = await octokit.rest.issues.listForRepo({
-    owner,
-    repo,
-    state: "open",
-    per_page: 1,
-  });
+  // Note: GitHub's Issues API returns both issues AND pull requests
+  // We must filter out PRs (items with pull_request property) to get true issue counts
+  let openCount = 0;
+  let closedCount = 0;
+  let issuesLastMonth = 0;
 
-  // Get count of closed issues (excluding PRs)
-  const { headers: closedHeaders } = await octokit.rest.issues.listForRepo({
-    owner,
-    repo,
-    state: "closed",
-    per_page: 1,
-  });
+  // Count open issues (excluding PRs) - fetch all pages for exact count
+  let page = 1;
+  while (true) {
+    const { data: issues } = await octokit.rest.issues.listForRepo({
+      owner,
+      repo,
+      state: "open",
+      per_page: 100,
+      page,
+    });
 
-  // Parse pagination headers to get total counts
-  let openCount = 1;
-  if (openHeaders.link) {
-    const match = openHeaders.link.match(/page=(\d+)>; rel="last"/);
-    openCount = match ? parseInt(match[1]) : 1;
+    if (issues.length === 0) break;
+
+    for (const issue of issues) {
+      if (!issue.pull_request) {
+        openCount++;
+      }
+    }
+
+    if (issues.length < 100) break;
+    page++;
+    await sleep(100);
   }
 
-  let closedCount = 1;
-  if (closedHeaders.link) {
-    const match = closedHeaders.link.match(/page=(\d+)>; rel="last"/);
-    closedCount = match ? parseInt(match[1]) : 1;
+  // Count closed issues (excluding PRs) - fetch all pages for exact count
+  page = 1;
+  while (true) {
+    const { data: issues } = await octokit.rest.issues.listForRepo({
+      owner,
+      repo,
+      state: "closed",
+      per_page: 100,
+      page,
+    });
+
+    if (issues.length === 0) break;
+
+    for (const issue of issues) {
+      if (!issue.pull_request) {
+        closedCount++;
+      }
+    }
+
+    if (issues.length < 100) break;
+    page++;
+    await sleep(100);
   }
 
   // Count issues created in the last month (excluding PRs)
-  let issuesLastMonth = 0;
-  let page = 1;
-
+  page = 1;
   while (page < 10) {
     const { data: issues } = await octokit.rest.issues.listForRepo({
       owner,
@@ -189,6 +212,7 @@ async function getIssueStats(owner: string, repo: string) {
       }
     }
     page++;
+    await sleep(100);
   }
 
   return {
@@ -221,7 +245,7 @@ async function collectContributors(repos: GitHubRepository[]): Promise<{
 
       data.forEach((c) => {
         // Filter out bots
-        if (c.login && !c.login.endsWith("[bot]")) {
+        if (c.login && !c.login.endsWith("[bot]") && !c.login.endsWith("-bot")) {
           allContributors.add(c.login);
           repoContributors.add(c.login);
         }
