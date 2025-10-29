@@ -3,7 +3,7 @@ export default {
     const originHeader = request.headers.get("Origin");
 
     const allowedOrigins = [
-      /^https?:\/\/localhost:\d+$/,
+      /^http?:\/\/localhost:\d+$/,
       "https://scverse.org",
       "https://scverse-stats.complextissue.com",
     ];

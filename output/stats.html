@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>scverse — stats</title>
+    <style>
+      :root {
+        --bg: #f7f7f8;
+        --tile-bg: #ffffff;
+        --muted: #6b6b6b;
+        --accent: #2b6cb0;
+        --gap: 16px;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          "Helvetica Neue",
+          Arial;
+      }
+      body {
+        background: var(--bg);
+        margin: 24px;
+        color: #111;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: var(--gap);
+      }
+      .tile {
+        background: var(--tile-bg);
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+      }
+      .large {
+        grid-column: span 2;
+      }
+      .value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+      .label {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .subtitle {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+      .note {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      @media (max-width: 700px) {
+        .large {
+          grid-column: span 1;
+        }
+      }
+      /* contributors grid */
+      .contributors-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .contrib {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 92px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .contrib img {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(0, 0, 0, 0.06);
+      }
+      .contrib-name {
+        font-size: 11px;
+        text-align: center;
+        margin-top: 6px;
+      }
+      .contributors-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .contrib-only {
+        background: #fff;
+        padding: 6px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #333;
+        text-decoration: none;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+      }
+    </style>
+  </head>
+  <body>
+    <div style="max-width: 960px; margin: 0 auto">
+      <header>
+        <h1>scverse — in numbers</h1>
+        <div class="note">Updated: <span id="ts">-</span></div>
+      </header>
+
+      <main>
+        <div class="grid" id="grid">
+          <div class="tile">
+            <div class="value" id="core_team">-</div>
+            <div class="label">core team members</div>
+          </div>
+
+          <div class="tile">
+            <div class="value" id="ecosystem_packages">-</div>
+            <div class="label">ecosystem packages</div>
+          </div>
+
+          <div class="tile">
+            <div class="value" id="zulip_users">-</div>
+            <div class="label">Zulip members</div>
+          </div>
+
+          <div class="tile">
+            <div class="value" id="bluesky_followers">-</div>
+            <div class="label">Bluesky followers</div>
+          </div>
+
+          <div class="tile">
+            <div class="value" id="pepy_avg_daily_30">-</div>
+            <div class="label">daily downloads (core)</div>
+          </div>
+
+          <div class="tile">
+            <div class="value" id="github_stars">-</div>
+            <div class="label">total GitHub stars (core)</div>
+          </div>
+
+          <div class="tile">
+            <div class="value" id="unique_contributors">-</div>
+            <div class="label">unique contributors (core)</div>
+          </div>
+
+          <div class="tile">
+            <div class="value" id="citation_count">-</div>
+            <div class="label">citations (total)</div>
+          </div>
+        </div>
+
+        <!-- Contributors section -->
+        <section style="margin-top: 24px">
+          <h2 style="margin: 0 0 12px 0; font-size: 16px">Top contributors</h2>
+          <div id="contributors" class="contributors-grid">
+            <div class="note">Loading contributors…</div>
+          </div>
+        </section>
+      </main>
+
+      <script>
+        const url = "/stats.json";
+        async function load() {
+          try {
+            const res = await fetch(url, { cache: "no-store" });
+            if (!res.ok) throw new Error("Fetch failed");
+            const data = await res.json();
+            document.getElementById("ts").textContent = new Date(
+              data.timestamp,
+            ).toLocaleString();
+
+            document.getElementById("ecosystem_packages").textContent =
+              data.ecosystem_packages ?? "-";
+            document.getElementById("zulip_users").textContent =
+              data.zulip_users ?? "-";
+            document.getElementById("bluesky_followers").textContent =
+              data.bluesky_followers ?? "-";
+            document.getElementById("github_stars").textContent =
+              data.github?.total_stars ?? "-";
+            document.getElementById("unique_contributors").textContent =
+              data.github?.unique_contributors ?? "-";
+            document.getElementById("citation_count").textContent =
+              data.citation_count ?? "-";
+            document.getElementById("pepy_avg_daily_30").textContent =
+              data.pepy_avg_daily_30
+                ? Intl.NumberFormat().format(Math.round(data.pepy_avg_daily_30))
+                : "-";
+
+            // optional: core team size if available via config or env; placeholder otherwise
+            document.getElementById("core_team").textContent = "-";
+          } catch (err) {
+            console.error(err);
+            document.getElementById("grid").innerHTML =
+              '<div class="tile">Failed to load stats</div>';
+          }
+        }
+        load();
+
+        // Contributors
+        async function loadContributors() {
+          const url = "/contributors.json";
+          const container = document.getElementById("contributors");
+          container.innerHTML = '<div class="note">Loading contributors…</div>';
+          try {
+            const res = await fetch(url, { cache: "no-store" });
+            if (!res.ok) throw new Error("no contributors");
+            const data = await res.json();
+            const list = data.contributors || data;
+            if (!Array.isArray(list) || list.length === 0) {
+              container.innerHTML =
+                '<div class="note">No contributors data available</div>';
+              return;
+            }
+
+            container.innerHTML = "";
+            const avatarsCount = 24;
+            const withAvatars = list.slice(0, avatarsCount);
+            const remaining = list.slice(avatarsCount, 200);
+
+            withAvatars.forEach((c) => {
+              const item = document.createElement("a");
+              item.className = "contrib";
+              item.href = c.html_url || `https://github.com/${c.login}`;
+              item.target = "_blank";
+              item.rel = "noopener noreferrer";
+
+              const img = document.createElement("img");
+              img.src = c.avatar_url || "";
+              img.alt = c.name || c.login || "";
+              img.loading = "lazy";
+              item.appendChild(img);
+
+              const label = document.createElement("div");
+              label.className = "contrib-name";
+              label.textContent = c.name || c.login || "";
+              item.appendChild(label);
+
+              if (typeof c.contributions === "number") {
+                item.title = `${c.name || c.login}: ${c.contributions} contributions`;
+              }
+
+              container.appendChild(item);
+            });
+
+            if (remaining.length > 0) {
+              const listWrap = document.createElement("div");
+              listWrap.className = "contributors-list";
+              remaining.forEach((c) => {
+                const a = document.createElement("a");
+                a.className = "contrib-only";
+                a.href = c.html_url || `https://github.com/${c.login}`;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.textContent = c.name || c.login || "";
+                listWrap.appendChild(a);
+              });
+              container.appendChild(listWrap);
+            }
+          } catch (err) {
+            container.innerHTML =
+              '<div class="note">Contributors not available</div>';
+          }
+        }
+        loadContributors();
+      </script>
+    </div>
+  </body>
+</html>

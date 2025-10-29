@@ -51,7 +51,9 @@ export async function combineStats(): Promise<void> {
       pepyData.computed &&
       typeof pepyData.computed.combined_avg_daily === "number"
     ) {
-      combinedStats.pepy_avg_daily_30 = Math.round(pepyData.computed.combined_avg_daily);
+      combinedStats.pepy_avg_daily_30 = Math.round(
+        pepyData.computed.combined_avg_daily,
+      );
     }
   }
 
