@@ -14,7 +14,9 @@ async function main() {
     collectGitHubStats().catch((e: any) =>
       console.error("GitHub failed:", e.message),
     ),
-    collectZulipStats().catch((e: any) => console.error("Zulip failed:", e.message)),
+    collectZulipStats().catch((e: any) =>
+      console.error("Zulip failed:", e.message),
+    ),
     collectBlueskyStats().catch((e: any) =>
       console.error("Bluesky failed:", e.message),
     ),

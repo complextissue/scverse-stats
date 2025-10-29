@@ -12,7 +12,7 @@ export async function collectZulipStats(): Promise<void> {
     apiKey: process.env.ZULIP_API_KEY,
     realm: process.env.ZULIP_REALM,
   };
-  
+
   const client = await zulipInit(config);
   const { members } = await client.users.retrieve();
 

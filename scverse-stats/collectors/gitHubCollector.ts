@@ -198,9 +198,10 @@ async function getIssueStats(owner: string, repo: string) {
   };
 }
 
-async function collectContributors(
-  repos: GitHubRepository[],
-): Promise<{ allContributors: Set<string>; repoContributorCounts: Map<string, number> }> {
+async function collectContributors(repos: GitHubRepository[]): Promise<{
+  allContributors: Set<string>;
+  repoContributorCounts: Map<string, number>;
+}> {
   const allContributors = new Set<string>();
   const repoContributorCounts = new Map<string, number>();
 
@@ -220,7 +221,7 @@ async function collectContributors(
 
       data.forEach((c) => {
         // Filter out bots
-        if (c.login && !c.login.endsWith('[bot]')) {
+        if (c.login && !c.login.endsWith("[bot]")) {
           allContributors.add(c.login);
           repoContributors.add(c.login);
         }
@@ -267,23 +268,22 @@ export async function collectGitHubStats(): Promise<void> {
       repo: packageName,
     });
 
-    const [starStats, prStats, issueStats] =
-      await Promise.all([
-        getStarStats("scverse", packageName).catch(() => ({
-          starsLastMonth: 0,
-          starsLastYear: 0,
-        })),
-        getPRStats("scverse", packageName).catch(() => ({
-          open: 0,
-          closed: 0,
-          last_month: 0,
-        })),
-        getIssueStats("scverse", packageName).catch(() => ({
-          open: 0,
-          closed: 0,
-          last_month: 0,
-        })),
-      ]);
+    const [starStats, prStats, issueStats] = await Promise.all([
+      getStarStats("scverse", packageName).catch(() => ({
+        starsLastMonth: 0,
+        starsLastYear: 0,
+      })),
+      getPRStats("scverse", packageName).catch(() => ({
+        open: 0,
+        closed: 0,
+        last_month: 0,
+      })),
+      getIssueStats("scverse", packageName).catch(() => ({
+        open: 0,
+        closed: 0,
+        last_month: 0,
+      })),
+    ]);
 
     repos.push({
       name: repo.name,
@@ -317,7 +317,8 @@ export async function collectGitHubStats(): Promise<void> {
 
   // Update contributor counts for each repo (excluding bots)
   repos.forEach((repo) => {
-    repo.contributors_count = contributorsData.repoContributorCounts.get(repo.name) || 0;
+    repo.contributors_count =
+      contributorsData.repoContributorCounts.get(repo.name) || 0;
   });
 
   repos.sort((a, b) => b.stargazers_count - a.stargazers_count);

@@ -17,7 +17,7 @@ export async function collectCitationStats(): Promise<void> {
 
   for (const pmid of citationIds) {
     const citationUrl = `https://www.ebi.ac.uk/europepmc/webservices/rest/MED/${pmid}/citations?page=1&pageSize=1&format=json`;
-    
+
     const response = await fetch(citationUrl);
     const data = (await response.json()) as any;
     const citationCount = data.hitCount || 0;
@@ -29,7 +29,7 @@ export async function collectCitationStats(): Promise<void> {
 
     totalCitations += citationCount;
     console.log(`  PMID ${pmid}: ${citationCount} citations`);
-    
+
     await sleep(100); // Be nice to the API
   }
 

@@ -5,6 +5,7 @@ Automated statistics collection for the scverse organization.
 ## Setup
 
 1. Copy `.env.example` to `.env` and fill in your credentials:
+
    ```bash
    cp .env.example .env
    ```
@@ -72,7 +73,7 @@ When deploying via GitHub Actions, set the following secrets in your repository:
 
 - `GITHUB_TOKEN` - Automatically provided by GitHub Actions, or use a custom PAT
 - `ZULIP_EMAIL` - Zulip account email
-- `ZULIP_API_KEY` - Zulip API key  
+- `ZULIP_API_KEY` - Zulip API key
 - `ZULIP_REALM` - Zulip realm URL
 
 These will be automatically used instead of the `.env` file when running in CI.
