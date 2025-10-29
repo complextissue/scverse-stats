@@ -72,6 +72,7 @@ export const GitHubRepositorySchema = z.object({
   pull_requests_open: z.number(),
   pull_requests_closed: z.number(),
   pull_requests_last_month: z.number(),
+  pull_requests_last_year: z.number(),
   issues_open: z.number(),
   issues_closed: z.number(),
   issues_last_month: z.number(),
@@ -88,6 +89,7 @@ export const GitHubDataSchema = z.object({
   unique_contributors: z.number(),
   organization_members: z.number(),
   total_pull_requests_open: z.number(),
+  total_pull_requests_last_year: z.number(),
   total_pull_requests_closed: z.number(),
   total_issues_open: z.number(),
   total_issues_closed: z.number(),
@@ -128,6 +130,7 @@ export const CombinedStatsSchema = z.object({
       organization_members: z.number(),
       total_pull_requests_open: z.number(),
       total_pull_requests_closed: z.number(),
+      total_pull_requests_last_year: z.number(),
       total_issues_open: z.number(),
       total_issues_closed: z.number(),
     })
@@ -136,6 +139,7 @@ export const CombinedStatsSchema = z.object({
   citation_count: z.number().optional(),
   pepy_downloads: z.number().optional(),
   pepy_avg_daily_30: z.number().optional(),
+  pull_requests_last_year: z.number().optional(),
 });
 
 export type CombinedStats = z.infer<typeof CombinedStatsSchema>;

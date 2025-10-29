@@ -166,6 +166,11 @@
             <div class="value" id="citation_count">-</div>
             <div class="label">citations (total)</div>
           </div>
+
+          <div class="tile">
+            <div class="value" id="pull_requests_last_year">-</div>
+            <div class="label">pull requests (last 365 days)</div>
+          </div>
         </div>
 
         <!-- Contributors section -->
@@ -204,6 +209,11 @@
               data.pepy_avg_daily_30
                 ? Intl.NumberFormat().format(Math.round(data.pepy_avg_daily_30))
                 : "-";
+
+            document.getElementById("pull_requests_last_year").textContent =
+              data.pull_requests_last_year ??
+              data.github?.total_pull_requests_last_year ??
+              "-";
 
             // optional: core team size if available via config or env; placeholder otherwise
             document.getElementById("core_team").textContent = "-";

@@ -32,9 +32,18 @@ export async function combineStats(): Promise<void> {
       organization_members: githubData.organization_members,
       total_pull_requests_open: githubData.total_pull_requests_open,
       total_pull_requests_closed: githubData.total_pull_requests_closed,
+      total_pull_requests_last_year: githubData.total_pull_requests_last_year,
       total_issues_open: githubData.total_issues_open,
       total_issues_closed: githubData.total_issues_closed,
     };
+  }
+
+  if (
+    githubData &&
+    typeof githubData.total_pull_requests_last_year === "number"
+  ) {
+    combinedStats.pull_requests_last_year =
+      githubData.total_pull_requests_last_year;
   }
 
   if (ecosystemData) {

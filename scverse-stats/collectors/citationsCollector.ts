@@ -7,6 +7,13 @@ const citationIds = [
   "38509327", // SpatialData
   "29409532", // Scanpy
   "35102346", // Squidpy
+  "35105358", // Muon
+  "35132262", // scvi-tools
+  "32614448", // scirpy
+  "36699385", // decoupler
+  "PPR891683", // pertpy
+  "PPR434191", // AnnData
+  "38191932", // SnapATAC2
 ];
 
 export async function collectCitationStats(): Promise<void> {
@@ -16,7 +23,9 @@ export async function collectCitationStats(): Promise<void> {
   let totalCitations = 0;
 
   for (const pmid of citationIds) {
-    const citationUrl = `https://www.ebi.ac.uk/europepmc/webservices/rest/MED/${pmid}/citations?page=1&pageSize=1&format=json`;
+    // Use PPR endpoint for Preprint IDs (those starting with "PPR"), otherwise use MED for PubMed IDs.
+    const idType = pmid.startsWith("PPR") ? "PPR" : "MED";
+    const citationUrl = `https://www.ebi.ac.uk/europepmc/webservices/rest/${idType}/${pmid}/citations?page=1&pageSize=1&format=json`;
 
     const response = await fetch(citationUrl);
     const data = (await response.json()) as any;

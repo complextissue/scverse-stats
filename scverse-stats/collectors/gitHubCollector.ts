@@ -74,6 +74,11 @@ async function getPRStats(owner: string, repo: string) {
     now.getMonth() - 1,
     now.getDate(),
   );
+  const oneYearAgo = new Date(
+    now.getFullYear() - 1,
+    now.getMonth(),
+    now.getDate(),
+  );
 
   // Get count of open PRs
   const { headers: openHeaders } = await octokit.rest.pulls.list({
@@ -104,8 +109,9 @@ async function getPRStats(owner: string, repo: string) {
     closedCount = match ? parseInt(match[1]) : 1;
   }
 
-  // Count PRs created in the last month
+  // Count PRs created in the last month and last year
   let prsLastMonth = 0;
+  let prsLastYear = 0;
   let page = 1;
 
   while (page < 10) {
@@ -122,12 +128,15 @@ async function getPRStats(owner: string, repo: string) {
     if (prs.length === 0) break;
 
     for (const pr of prs) {
-      if (pr.created_at && new Date(pr.created_at) >= oneMonthAgo) {
-        prsLastMonth++;
+      if (pr.created_at) {
+        const created = new Date(pr.created_at);
+        if (created >= oneMonthAgo) prsLastMonth++;
+        if (created >= oneYearAgo) prsLastYear++;
       } else {
         page = 99;
         break;
       }
+      // if a PR is older than a year we still need to keep scanning until we reach it
     }
     page++;
   }
@@ -136,6 +145,7 @@ async function getPRStats(owner: string, repo: string) {
     open: openCount,
     closed: closedCount,
     last_month: prsLastMonth,
+    last_year: prsLastYear,
   };
 }
 
@@ -370,6 +380,7 @@ export async function collectGitHubStats(): Promise<void> {
         open: 0,
         closed: 0,
         last_month: 0,
+        last_year: 0,
       })),
       getIssueStats("scverse", packageName).catch(() => ({
         open: 0,
@@ -394,6 +405,7 @@ export async function collectGitHubStats(): Promise<void> {
       pull_requests_open: prStats.open,
       pull_requests_closed: prStats.closed,
       pull_requests_last_month: prStats.last_month,
+      pull_requests_last_year: prStats.last_year || 0,
       issues_open: issueStats.open,
       issues_closed: issueStats.closed,
       issues_last_month: issueStats.last_month,
@@ -433,6 +445,10 @@ export async function collectGitHubStats(): Promise<void> {
     ),
     total_pull_requests_closed: repos.reduce(
       (sum, r) => sum + r.pull_requests_closed,
+      0,
+    ),
+    total_pull_requests_last_year: repos.reduce(
+      (sum, r) => sum + (r.pull_requests_last_year || 0),
       0,
     ),
     total_issues_open: repos.reduce((sum, r) => sum + r.issues_open, 0),
