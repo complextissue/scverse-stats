@@ -3,8 +3,6 @@
     "target": "ES2020",
     "module": "commonjs",
     "lib": ["ES2020"],
-    "outDir": "./dist",
-    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -14,5 +12,5 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["scverse-stats/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "output"]
 }

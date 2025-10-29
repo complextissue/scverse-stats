@@ -6,6 +6,6 @@
   "assets": {
     "directory": "./build/",
     "run_worker_first": true,
-    "binding": "ASSETS"
-  }
+    "binding": "ASSETS",
+  },
 }

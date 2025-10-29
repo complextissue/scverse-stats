@@ -30,6 +30,9 @@ jobs:
       - name: Generate scverse stats
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          ZULIP_EMAIL: ${{ secrets.ZULIP_EMAIL }}
+          ZULIP_API_KEY: ${{ secrets.ZULIP_API_KEY }}
+          ZULIP_REALM: ${{ secrets.ZULIP_REALM }}
         run: |
           npm start
 

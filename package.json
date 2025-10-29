@@ -1,19 +1,18 @@
 {
   "name": "scverse-stats",
   "version": "1.0.0",
-  "description": "GitHub stats collector for scverse organization",
-  "main": "scverse-stats/gitHubStars.ts",
+  "description": "Automated statistics collection for scverse organization",
   "scripts": {
-    "start": "npx tsx scverse-stats/gitHubStars.ts",
-    "build": "tsc",
-    "dev": "npx tsx scverse-stats/gitHubStars.ts"
+    "start": "tsx scverse-stats/index.ts",
+    "dev": "tsx scverse-stats/index.ts"
   },
   "keywords": [
+    "scverse",
+    "statistics",
     "github",
-    "stats",
-    "scverse"
+    "analytics"
   ],
-  "author": "",
+  "author": "scverse",
   "license": "MIT",
   "dependencies": {
     "@octokit/rest": "^20.0.2",
@@ -22,7 +21,9 @@
     "chartjs-node-canvas": "^5.0.0",
     "dotenv": "^17.2.2",
     "js-yaml": "^4.1.0",
-    "wrangler": "^4.36.0"
+    "wrangler": "^4.36.0",
+    "zod": "^4.1.12",
+    "zulip-js": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
