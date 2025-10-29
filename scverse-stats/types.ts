@@ -134,6 +134,26 @@ export const CombinedStatsSchema = z.object({
     .optional(),
   ecosystem_packages: z.number().optional(),
   citation_count: z.number().optional(),
+  pepy_downloads: z.number().optional(),
+  pepy_avg_daily_30: z.number().optional(),
 });
 
 export type CombinedStats = z.infer<typeof CombinedStatsSchema>;
+
+// PEPY schemas
+export const PepyPackageSchema = z.object({
+  id: z.string(),
+  total_downloads: z.number(),
+  versions: z.array(z.string()),
+  downloads: z.record(z.string(), z.record(z.string(), z.number())),
+});
+
+export type PepyPackage = z.infer<typeof PepyPackageSchema>;
+
+export const PepyDataSchema = z.object({
+  packages: z.array(PepyPackageSchema),
+  total_downloads: z.number(),
+  timestamp: z.string(),
+});
+
+export type PepyData = z.infer<typeof PepyDataSchema>;

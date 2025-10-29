@@ -266,7 +266,10 @@ async function collectContributors(repos: GitHubRepository[]): Promise<{
         if (!contributor.login) continue;
 
         // Filter out bots
-        if (contributor.login.endsWith("[bot]") || contributor.login.endsWith("-bot")) {
+        if (
+          contributor.login.endsWith("[bot]") ||
+          contributor.login.endsWith("-bot")
+        ) {
           continue;
         }
 
@@ -451,5 +454,7 @@ export async function collectGitHubStats(): Promise<void> {
   });
 
   await saveJson("contributors.json", contributorsValidated);
-  console.log(`Total unique contributors: ${contributorsValidated.total_contributors}`);
+  console.log(
+    `Total unique contributors: ${contributorsValidated.total_contributors}`,
+  );
 }

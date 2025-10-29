@@ -8,6 +8,7 @@ export async function combineStats(): Promise<void> {
   const blueskyData = await loadJson("bluesky.json");
   const ecosystemData = await loadJson("ecosystem.json");
   const citationsData = await loadJson("citations.json");
+  const pepyData = await loadJson("pepy.json");
 
   const combinedStats: any = {
     timestamp: new Date().toISOString(),
@@ -42,6 +43,16 @@ export async function combineStats(): Promise<void> {
 
   if (citationsData) {
     combinedStats.citation_count = citationsData.total_citation_count;
+  }
+
+  if (pepyData) {
+    combinedStats.pepy_downloads = pepyData.total_downloads;
+    if (
+      pepyData.computed &&
+      typeof pepyData.computed.combined_avg_daily === "number"
+    ) {
+      combinedStats.pepy_avg_daily_30 = Math.round(pepyData.computed.combined_avg_daily);
+    }
   }
 
   const validated = CombinedStatsSchema.parse(combinedStats);

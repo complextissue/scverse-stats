@@ -4,6 +4,7 @@ import { collectZulipStats } from "./collectors/zulipCollector";
 import { collectBlueskyStats } from "./collectors/blueskyCollector";
 import { collectEcosystemStats } from "./collectors/ecosystemCollector";
 import { collectCitationStats } from "./collectors/citationsCollector";
+import { collectPepyStats } from "./collectors/pepyCollector";
 import { combineStats } from "./combiner";
 
 async function main() {
@@ -15,6 +16,7 @@ async function main() {
     collectBlueskyStats(),
     collectEcosystemStats(),
     collectCitationStats(),
+    collectPepyStats(),
   ]);
 
   console.log("\nCombining statistics...");
