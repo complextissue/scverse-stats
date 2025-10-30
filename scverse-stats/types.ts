@@ -120,7 +120,8 @@ export type CitationsData = z.infer<typeof CitationsDataSchema>;
 export const CombinedStatsSchema = z.object({
   timestamp: z.string(),
   bluesky_followers: z.number().optional(),
-  zulip_users: z.number().optional(),
+  zulip_users: z.number(),
+  core_team_size: z.number(),
   github: z
     .object({
       total_repositories: z.number(),

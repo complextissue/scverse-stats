@@ -216,9 +216,6 @@
               data.pull_requests_last_year ??
               data.github?.total_pull_requests_last_year ??
               "-";
-
-            // optional: core team size if available via config or env; placeholder otherwise
-            document.getElementById("core_team").textContent = "-";
           } catch (err) {
             console.error(err);
             document.getElementById("grid").innerHTML =
