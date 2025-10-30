@@ -183,7 +183,7 @@
       </main>
 
       <script>
-        const url = "/stats.json";
+        const url = "./stats.json";
         async function load() {
           try {
             const res = await fetch(url, { cache: "no-store" });
@@ -229,7 +229,7 @@
 
         // Contributors
         async function loadContributors() {
-          const url = "/contributors.json";
+          const url = "./contributors.json";
           const container = document.getElementById("contributors");
           container.innerHTML = '<div class="note">Loading contributors…</div>';
           try {
