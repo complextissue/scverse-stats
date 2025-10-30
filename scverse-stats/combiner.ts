@@ -20,6 +20,7 @@ export async function combineStats(): Promise<void> {
 
   if (zulipData) {
     combinedStats.zulip_users = zulipData.active_users;
+    combinedStats.core_team_size = zulipData.core_team_size;
   }
 
   if (githubData) {

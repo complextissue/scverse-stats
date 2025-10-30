@@ -12,6 +12,7 @@ export type ZulipUser = z.infer<typeof ZulipUserSchema>;
 
 export const ZulipDataSchema = z.object({
   active_users: z.number(),
+  core_team_size: z.number(),
   timestamp: z.string(),
 });
 

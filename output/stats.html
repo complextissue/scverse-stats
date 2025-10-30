@@ -128,7 +128,7 @@
       <main>
         <div class="grid" id="grid">
           <div class="tile">
-            <div class="value" id="core_team">-</div>
+            <div class="value" id="core_team_size">-</div>
             <div class="label">core team members</div>
           </div>
 
@@ -197,6 +197,8 @@
               data.ecosystem_packages ?? "-";
             document.getElementById("zulip_users").textContent =
               data.zulip_users ?? "-";
+            document.getElementById("core_team_size").textContent =
+              data.core_team_size ?? "-";
             document.getElementById("bluesky_followers").textContent =
               data.bluesky_followers ?? "-";
             document.getElementById("github_stars").textContent =

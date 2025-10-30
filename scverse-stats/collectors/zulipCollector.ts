@@ -18,11 +18,18 @@ export async function collectZulipStats(): Promise<void> {
 
   const activeUsers = members.filter((m: any) => !m.is_bot && m.is_active);
 
+  // Get the subscribers to the "core" stream as a proxy for core team size
+  const streams = await client.streams.retrieve()
+  const coreStream = streams["streams"].filter((stream: any) => stream.name === "website")[0]
+  const coreSubscribers = coreStream.subscriber_count || 0;
+
   const validated = ZulipDataSchema.parse({
     active_users: activeUsers.length,
+    core_team_size: coreSubscribers,
     timestamp: new Date().toISOString(),
   });
 
   await saveJson("zulip.json", validated);
   console.log(`Active users: ${validated.active_users}`);
+  console.log(`Core team size: ${validated.core_team_size}`);
 }

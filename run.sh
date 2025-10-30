@@ -1,1 +1,0 @@
-npx tsx scverse-stats/gitHubStars.ts

@@ -16,6 +16,13 @@ Automated statistics collection for the scverse organization.
    - `ZULIP_API_KEY` - Your Zulip API key
    - `ZULIP_REALM` - Your Zulip realm URL (e.g., https://scverse.zulipchat.com)
 
+3. Set up node
+
+    ```bash
+    nvm use
+    npm i
+    ```
+
 ## Structure
 
 ```
@@ -61,7 +68,6 @@ All data is saved to `output/` directory:
 2. Each collector validates data with Zod schemas (drops unknown fields)
 3. Collectors save individual JSON files to `output/`
 4. Combiner reads all files and creates combined `stats.json`
-5. Errors in individual collectors don't block others
 
 ## Configuration
 
