@@ -5,7 +5,7 @@ import { saveJson } from "../utils";
 export async function collectEcosystemStats(): Promise<void> {
   console.log("Collecting ecosystem packages...");
 
-  const ecosystemUrl = "https://scverse.org/ecosystem-packages/ecosystem.json";
+  const ecosystemUrl = "https://scverse.org/ecosystem-packages/packages.json";
   const response = await fetch(ecosystemUrl);
   const packages = (await response.json()) as any[];
 
