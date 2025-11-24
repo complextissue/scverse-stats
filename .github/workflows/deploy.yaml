@@ -5,8 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    # Run daily at 06:00 UTC to get fresh stats
-    - cron: "0 6 * * *"
+    # Run Mondays and Thursdays at 06:00 UTC to get fresh stats
+    - cron: "0 6 * * 1,4"
 
 jobs:
   generate-data:
